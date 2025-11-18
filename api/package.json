@@ -1,0 +1,26 @@
+{
+	"name": "linktree-api",
+	"version": "0.1.0",
+	"description": "",
+	"license": "MIT",
+	"author": "astr0n0mer",
+	"type": "module",
+	"main": "src/server.ts",
+	"scripts": {
+		"server": "tsx src/server.ts",
+		"watch": "tsx --watch src/server.ts",
+		"test": "echo \"Error: no test specified\" && exit 1"
+	},
+	"dependencies": {
+		"@clerk/express": "^1.7.50",
+		"dotenv": "^17.2.3",
+		"express": "^5.1.0"
+	},
+	"devDependencies": {
+		"@types/express": "^5.0.5",
+		"tsx": "^4.20.6"
+	},
+	"engines": {
+		"node": "lts"
+	}
+}
