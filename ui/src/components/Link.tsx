@@ -4,6 +4,7 @@ import LinkForm from "./LinkForm"
 import { Button } from "@/components/ui/button"
 import { useLinks } from "@/contexts/LinksContext"
 import { ChevronUp, ChevronDown, Pencil, Trash2, MoreVertical, Copy, Check } from "lucide-react"
+import { getLinkIcon } from "@/lib/linkIcons"
 import {
 	AlertDialog,
 	AlertDialogAction,
@@ -35,6 +36,8 @@ export const Link = ({ link, isFirst, isLast }: LinkProps) => {
 	const [showEditForm, setShowEditForm] = useState(false)
 	const [copied, setCopied] = useState(false)
 
+	const Icon = getLinkIcon(url)
+
 	const handleCopyLink = async () => {
 		const domain = window.location.origin // Gets current domain
 		const fullUrl = `${domain}/${slug}`
@@ -54,9 +57,10 @@ export const Link = ({ link, isFirst, isLast }: LinkProps) => {
 				href={url}
 				target="_blank"
 				rel="noopener noreferrer"
-				className="block px-6 py-4 pr-16 bg-background border border-border rounded-lg hover:bg-accent hover:border-border transition-colors duration-200"
+				className="flex items-center justify-center gap-3 px-6 py-4 pr-16 bg-background border border-border rounded-lg hover:bg-accent hover:border-border transition-colors duration-200"
 			>
-				<span className="text-center block font-medium text-foreground">
+				<Icon className="h-5 w-5 flex-shrink-0" />
+				<span className="font-medium text-foreground">
 					{title}
 				</span>
 			</a>
