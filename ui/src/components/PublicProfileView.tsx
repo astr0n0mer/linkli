@@ -29,6 +29,19 @@ function ProfileContent({ username }: { username: string }) {
 							trigger={<Button>Add Link</Button>}
 						/>
 					</div>
+				) : isSignedIn ? (
+					<div className="flex justify-center py-8">
+						<div className="text-center space-y-4">
+							<p className="text-muted-foreground">Want to manage your own links?</p>
+							<Button
+								size="lg"
+								variant="default"
+								onClick={() => window.location.href = `/u/${user?.username}`}
+							>
+								Go to Your Linktree
+							</Button>
+						</div>
+					</div>
 				) : (
 					<div className="flex justify-center py-8">
 						<div className="text-center space-y-4">

@@ -13,7 +13,7 @@ interface LinksContextType {
 	addLink: (data: { title: string; url: string; slug: string; category: string }) => Promise<void>
 	editLink: (id: string, data: { title: string; url: string; slug: string; category: string }) => Promise<void>
 	deleteLink: (id: string) => Promise<void>
-	moveLink: (id: string, direction: 'up' | 'down') => void
+	moveLink: (id: string, direction: 'up' | 'down') => Promise<void>
 	toggleLinkStatus: (id: string) => Promise<void>
 	refetch: () => Promise<void>
 }
@@ -102,8 +102,49 @@ export const LinksProvider = ({ children, targetUsername, isOwnProfile }: { chil
 		}
 	}
 
-	const moveLink = (id: string, direction: 'up' | 'down') => {
-		dispatch({ type: 'MOVE_LINK', payload: { id, direction } })
+	const moveLink = async (id: string, direction: 'up' | 'down') => {
+		try {
+			// First update local state for immediate UI feedback
+			dispatch({ type: 'MOVE_LINK', payload: { id, direction } })
+
+			const token = await getToken()
+			if (!token) throw new Error('No auth token')
+
+			// Find the current link and target link to swap
+			const currentIndex = links.findIndex(l => l.id === id)
+			if (currentIndex === -1) return
+
+			const targetIndex = direction === 'up' ? currentIndex - 1 : currentIndex + 1
+			if (targetIndex < 0 || targetIndex >= links.length) return
+
+			const currentLink = links[currentIndex]
+			const targetLink = links[targetIndex]
+
+			// Update both links with swapped order values
+			await Promise.all([
+				api.links.update(currentLink.id, {
+					title: currentLink.title,
+					url: currentLink.url,
+					slug: currentLink.slug,
+					category: currentLink.category,
+					visibility: currentLink.visibility,
+					order: targetLink.order
+				}, token),
+				api.links.update(targetLink.id, {
+					title: targetLink.title,
+					url: targetLink.url,
+					slug: targetLink.slug,
+					category: targetLink.category,
+					visibility: targetLink.visibility,
+					order: currentLink.order
+				}, token)
+			])
+		} catch (err) {
+			setError(err instanceof Error ? err.message : 'Failed to move link')
+			// Refetch to restore correct state if backend update fails
+			await refetch()
+			throw err
+		}
 	}
 
 	const toggleLinkStatus = async (id: string) => {
@@ -115,12 +156,25 @@ export const LinksProvider = ({ children, targetUsername, isOwnProfile }: { chil
 			if (!link) throw new Error('Link not found')
 
 			const newVisibility = link.visibility === 'public' ? 'private' : 'public'
+
+			// If changing from private to public, set order to be last among public links
+			// If changing from public to private, keep the same order
+			let newOrder = link.order
+			if (newVisibility === 'public' && link.visibility === 'private') {
+				// Find the maximum order value among public links and add 1
+				const publicLinks = links.filter(l => l.visibility === 'public')
+				newOrder = publicLinks.length > 0
+					? Math.max(...publicLinks.map(l => l.order)) + 1
+					: 0
+			}
+
 			const response = await api.links.update(id, {
 				title: link.title,
 				url: link.url,
 				slug: link.slug,
 				category: link.category,
-				visibility: newVisibility
+				visibility: newVisibility,
+				order: newOrder
 			}, token)
 
 			dispatch({ type: 'EDIT_LINK', payload: response.data })

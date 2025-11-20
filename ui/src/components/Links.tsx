@@ -42,10 +42,10 @@ export const Links = () => {
 			{/* Public Links */}
 			{publicLinks.map((link, index) => (
 				<Link
-					key={link.id}
+					key={link.order}
 					link={link}
 					isFirst={index === 0}
-					isLast={index === publicLinks.length - 1 && privateLinks.length === 0}
+					isLast={index === publicLinks.length - 1}
 					isOwnProfile={isOwnProfile}
 				/>
 			))}
@@ -60,9 +60,9 @@ export const Links = () => {
 					</div>
 					{privateLinks.map((link, index) => (
 						<Link
-							key={link.id}
+							key={link.order}
 							link={link}
-							isFirst={false}
+							isFirst={index === 0}
 							isLast={index === privateLinks.length - 1}
 							isOwnProfile={isOwnProfile}
 						/>

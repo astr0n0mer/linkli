@@ -19,9 +19,11 @@ export const linksReducer = (state: LinkType[], action: LinksAction): LinkType[]
 		}
 
 		case 'EDIT_LINK': {
-			return state.map(link =>
+			const updatedLinks = state.map(link =>
 				link.id === action.payload.id ? action.payload : link
 			)
+			// Sort by order to ensure correct positioning after order changes
+			return updatedLinks.sort((a, b) => a.order - b.order)
 		}
 
 		case 'DELETE_LINK': {
@@ -44,19 +46,20 @@ export const linksReducer = (state: LinkType[], action: LinksAction): LinkType[]
 			// Can't move down if already at bottom
 			if (direction === 'down' && index === state.length - 1) return state
 
-			const newState = [...state]
 			const targetIndex = direction === 'up' ? index - 1 : index + 1
 
-			// Swap the links
-			const temp = newState[index]
-			newState[index] = newState[targetIndex]
-			newState[targetIndex] = temp
+			// Swap the order values without mutating the original objects
+			const newState = state.map((link, idx) => {
+				if (idx === index) {
+					return { ...link, order: state[targetIndex].order }
+				}
+				if (idx === targetIndex) {
+					return { ...link, order: state[index].order }
+				}
+				return link
+			})
 
-			// Update order values
-			return newState.map((link, idx) => ({
-				...link,
-				order: idx + 1
-			}))
+			return newState.sort((a, b) => a.order - b.order)
 		}
 
 		default:
