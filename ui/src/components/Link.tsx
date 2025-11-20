@@ -3,7 +3,7 @@ import type { LinkType } from "@/lib/types"
 import LinkForm from "./LinkForm"
 import { Button } from "@/components/ui/button"
 import { useLinks } from "@/contexts/LinksContext"
-import { ChevronUp, ChevronDown, Pencil, Trash2, MoreVertical, Copy, Check } from "lucide-react"
+import { ChevronUp, ChevronDown, Pencil, Trash2, MoreVertical, Copy, Check, Lock, Globe } from "lucide-react"
 import { getLinkIcon } from "@/lib/linkIcons"
 import {
 	AlertDialog,
@@ -30,8 +30,8 @@ interface LinkProps {
 }
 
 export const Link = ({ link, isFirst, isLast }: LinkProps) => {
-	const { title, url, slug } = link
-	const { moveLink, deleteLink } = useLinks()
+	const { title, url, slug, visibility } = link
+	const { moveLink, deleteLink, toggleLinkStatus } = useLinks()
 	const [showDeleteDialog, setShowDeleteDialog] = useState(false)
 	const [showEditForm, setShowEditForm] = useState(false)
 	const [copied, setCopied] = useState(false)
@@ -51,13 +51,17 @@ export const Link = ({ link, isFirst, isLast }: LinkProps) => {
 		}
 	}
 
+	const isPrivate = visibility === 'private'
+
 	return (
 		<div className="w-full max-w-xl mx-auto relative group">
 			<a
 				href={url}
 				target="_blank"
 				rel="noopener noreferrer"
-				className="flex items-center justify-center gap-3 px-6 py-4 pr-16 bg-background border border-border rounded-lg hover:bg-accent hover:border-border transition-colors duration-200"
+				className={`flex items-center justify-center gap-3 px-6 py-4 pr-16 bg-background border border-border rounded-lg hover:bg-accent hover:border-border transition-colors duration-200 ${
+					isPrivate ? 'opacity-50' : ''
+				}`}
 			>
 				<Icon className="h-5 w-5 flex-shrink-0" />
 				<span className="font-medium text-foreground">
@@ -79,6 +83,22 @@ export const Link = ({ link, isFirst, isLast }: LinkProps) => {
 								<Copy className="h-4 w-4 mr-2" />
 							)}
 							{copied ? 'Copied!' : 'Copy'}
+						</DropdownMenuItem>
+						<DropdownMenuSeparator />
+						<DropdownMenuItem
+							onClick={() => toggleLinkStatus(link.id)}
+						>
+							{visibility === 'public' ? (
+								<>
+									<Lock className="h-4 w-4 mr-2" />
+									Make Private
+								</>
+							) : (
+								<>
+									<Globe className="h-4 w-4 mr-2" />
+									Make Public
+								</>
+							)}
 						</DropdownMenuItem>
 						<DropdownMenuSeparator />
 						<DropdownMenuItem

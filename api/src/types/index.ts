@@ -1,6 +1,6 @@
-export enum LinkStatus {
-	ACTIVE = "active",
-	INACTIVE = "inactive",
+export enum LinkVisibility {
+	PUBLIC = "public",
+	PRIVATE = "private",
 }
 
 export interface LinkType {
@@ -11,7 +11,7 @@ export interface LinkType {
 	ownerId: string // who created it
 	createdAt: number
 	updatedAt: number
-	status: LinkStatus
+	visibility: LinkVisibility
 	category: string
 	order: number
 }

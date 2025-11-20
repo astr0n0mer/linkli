@@ -44,7 +44,7 @@ router.post("/", requireAuth(), async (req, res) => {
 	try {
 		const { userId } = getAuth(req)
 		const linksService = getLinksService()
-		const { title, url, slug, status, category, order } = req.body
+		const { title, url, slug, visibility, category, order } = req.body
 
 		if (!title || !url || !slug) {
 			return res.status(400).send({ error: 'Missing required fields: title, url, slug' })
@@ -55,7 +55,7 @@ router.post("/", requireAuth(), async (req, res) => {
 			url,
 			slug,
 			ownerId: userId, // Use authenticated userId
-			status: status || 'active',
+			visibility: visibility || 'public',
 			category: category || '',
 			order: order || 0
 		})
@@ -82,13 +82,13 @@ router.put("/:id", requireAuth(), async (req, res) => {
 			return res.sendStatus(403)
 		}
 
-		const { title, url, slug, status, category, order } = req.body
+		const { title, url, slug, visibility, category, order } = req.body
 
 		const updatedLink = await linksService.update(req.params.id, {
 			title,
 			url,
 			slug,
-			status,
+			visibility,
 			category,
 			order
 		})

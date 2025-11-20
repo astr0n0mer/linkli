@@ -13,6 +13,7 @@ interface LinksContextType {
 	editLink: (id: string, data: { title: string; url: string; slug: string; category: string }) => Promise<void>
 	deleteLink: (id: string) => Promise<void>
 	moveLink: (id: string, direction: 'up' | 'down') => void
+	toggleLinkStatus: (id: string) => Promise<void>
 	refetch: () => Promise<void>
 }
 
@@ -90,8 +91,32 @@ export const LinksProvider = ({ children }: { children: ReactNode }) => {
 		dispatch({ type: 'MOVE_LINK', payload: { id, direction } })
 	}
 
+	const toggleLinkStatus = async (id: string) => {
+		try {
+			const token = await getToken()
+			if (!token) throw new Error('No auth token')
+
+			const link = links.find(l => l.id === id)
+			if (!link) throw new Error('Link not found')
+
+			const newVisibility = link.visibility === 'public' ? 'private' : 'public'
+			const response = await api.links.update(id, {
+				title: link.title,
+				url: link.url,
+				slug: link.slug,
+				category: link.category,
+				visibility: newVisibility
+			}, token)
+
+			dispatch({ type: 'EDIT_LINK', payload: response.data })
+		} catch (err) {
+			setError(err instanceof Error ? err.message : 'Failed to toggle link visibility')
+			throw err
+		}
+	}
+
 	return (
-		<LinksContext.Provider value={{ links, loading, error, dispatch, addLink, editLink, deleteLink, moveLink, refetch }}>
+		<LinksContext.Provider value={{ links, loading, error, dispatch, addLink, editLink, deleteLink, moveLink, toggleLinkStatus, refetch }}>
 			{children}
 		</LinksContext.Provider>
 	)
