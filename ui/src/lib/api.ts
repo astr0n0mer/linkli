@@ -1,3 +1,5 @@
+import type { LinkType, Profile } from './types'
+
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001'
 
 interface ApiOptions extends RequestInit {
@@ -9,6 +11,10 @@ class ApiError extends Error {
 		super(message)
 		this.name = 'ApiError'
 	}
+}
+
+interface ApiResponse<T> {
+	data: T
 }
 
 async function apiRequest<T>(endpoint: string, options: ApiOptions = {}): Promise<T> {
@@ -46,27 +52,33 @@ export const api = {
 	// Links endpoints
 	links: {
 		getAll: (token: string) =>
-			apiRequest<{ data: any[] }>('/api/v1/links', { token }),
+			apiRequest<ApiResponse<LinkType[]>>('/api/v1/links', { token }),
+
+		getByUsername: (username: string) =>
+			apiRequest<ApiResponse<LinkType[]>>(`/api/v1/links/username/${username}`),
+
+		getByUserId: (userId: string) =>
+			apiRequest<ApiResponse<LinkType[]>>(`/api/v1/links/user/${userId}`),
 
 		getById: (id: string, token: string) =>
-			apiRequest<{ data: any }>(`/api/v1/links/${id}`, { token }),
+			apiRequest<ApiResponse<LinkType>>(`/api/v1/links/${id}`, { token }),
 
-		create: (data: any, token: string) =>
-			apiRequest<{ data: any }>('/api/v1/links', {
+		create: (data: Omit<LinkType, 'id' | 'createdAt' | 'updatedAt' | 'ownerId'>, token: string) =>
+			apiRequest<ApiResponse<LinkType>>('/api/v1/links', {
 				method: 'POST',
 				body: JSON.stringify(data),
 				token,
 			}),
 
-		update: (id: string, data: any, token: string) =>
-			apiRequest<{ data: any }>(`/api/v1/links/${id}`, {
+		update: (id: string, data: Partial<Omit<LinkType, 'id' | 'createdAt' | 'updatedAt' | 'ownerId'>>, token: string) =>
+			apiRequest<ApiResponse<LinkType>>(`/api/v1/links/${id}`, {
 				method: 'PUT',
 				body: JSON.stringify(data),
 				token,
 			}),
 
 		delete: (id: string, token: string) =>
-			apiRequest<{}>(`/api/v1/links/${id}`, {
+			apiRequest<Record<string, never>>(`/api/v1/links/${id}`, {
 				method: 'DELETE',
 				token,
 			}),
@@ -75,13 +87,16 @@ export const api = {
 	// Profile endpoints
 	profile: {
 		getMe: (token: string) =>
-			apiRequest<{ data: any }>('/api/v1/profiles/me', { token }),
+			apiRequest<ApiResponse<Profile>>('/api/v1/profiles/me', { token }),
+
+		getByUsername: (username: string) =>
+			apiRequest<ApiResponse<Profile & { firstName: string; lastName: string; avatarUrl: string }>>(`/api/v1/profiles/username/${username}`),
 
 		getByUserId: (userId: string) =>
-			apiRequest<{ data: any }>(`/api/v1/profiles/${userId}`),
+			apiRequest<ApiResponse<Profile & { firstName: string; lastName: string; avatarUrl: string }>>(`/api/v1/profiles/${userId}`),
 
-		updateMe: (data: any, token: string) =>
-			apiRequest<{ data: any }>('/api/v1/profiles/me', {
+		updateMe: (data: Partial<Omit<Profile, 'userid'>>, token: string) =>
+			apiRequest<ApiResponse<Profile>>('/api/v1/profiles/me', {
 				method: 'PUT',
 				body: JSON.stringify(data),
 				token,

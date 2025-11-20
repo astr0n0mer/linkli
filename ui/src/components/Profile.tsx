@@ -7,7 +7,7 @@ import ProfileEditForm from './ProfileEditForm'
 import { Pencil } from 'lucide-react'
 
 export const Profile = () => {
-	const { profile, loading, error } = useProfile()
+	const { profile, loading, error, isOwnProfile } = useProfile()
 
 	if (loading) {
 		return (
@@ -52,13 +52,15 @@ export const Profile = () => {
 				<TypographyLead className="text-center text-lg max-w-xl">
 					{bio || 'No bio yet'}
 				</TypographyLead>
-				<ProfileEditForm
-					trigger={
-						<button className="p-2 rounded-full hover:bg-accent transition-colors flex-shrink-0" aria-label="Edit bio">
-							<Pencil className="h-4 w-4" />
-						</button>
-					}
-				/>
+				{isOwnProfile && (
+					<ProfileEditForm
+						trigger={
+							<button className="p-2 rounded-full hover:bg-accent transition-colors flex-shrink-0" aria-label="Edit bio">
+								<Pencil className="h-4 w-4" />
+							</button>
+						}
+					/>
+				)}
 			</div>
 		</div>
 	)

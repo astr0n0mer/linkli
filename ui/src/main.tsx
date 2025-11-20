@@ -1,5 +1,6 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
+import { BrowserRouter } from 'react-router-dom'
 import { ClerkProvider } from '@clerk/clerk-react'
 import { dark } from '@clerk/themes'
 import './index.css'
@@ -29,10 +30,12 @@ function ClerkWithTheme({ children }: { children: React.ReactNode }) {
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    <ThemeProvider>
-      <ClerkWithTheme>
-        <App />
-      </ClerkWithTheme>
-    </ThemeProvider>
+    <BrowserRouter>
+      <ThemeProvider>
+        <ClerkWithTheme>
+          <App />
+        </ClerkWithTheme>
+      </ThemeProvider>
+    </BrowserRouter>
   </StrictMode>,
 )

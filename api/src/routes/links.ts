@@ -1,17 +1,64 @@
 import express from "express"
 import { requireAuth, getAuth } from "@clerk/express"
 import { LinksService } from "../services/LinksService.ts"
+import { ProfilesService } from "../services/ProfilesService.ts"
 
 const router = express.Router()
 
 const getLinksService = () => new LinksService()
+const getProfilesService = () => new ProfilesService()
 
+// Get own links (authenticated)
 router.get("/", requireAuth(), async (req, res) => {
 	try {
 		const { userId } = getAuth(req)
 		const linksService = getLinksService()
 		const links = await linksService.getByOwnerId(userId)
 		res.send({ data: links })
+	} catch (error) {
+		console.error('Error fetching links:', error)
+		res.status(500).send({ error: 'Failed to fetch links' })
+	}
+})
+
+// Get public links by username (public endpoint - only returns public links)
+router.get("/username/:username", async (req, res) => {
+	try {
+		const { clerkClient } = await import("@clerk/express")
+
+		// First, find the Clerk user by username
+		const users = await clerkClient.users.getUserList({
+			username: [req.params.username]
+		})
+
+		if (!users.data || users.data.length === 0) {
+			return res.sendStatus(404)
+		}
+
+		const user = users.data[0]
+		const linksService = getLinksService()
+		const links = await linksService.getByOwnerId(user.id)
+
+		// Filter to only return public links for public endpoint
+		const publicLinks = links.filter(link => link.visibility === 'public')
+
+		res.send({ data: publicLinks })
+	} catch (error) {
+		console.error('Error fetching links:', error)
+		res.status(500).send({ error: 'Failed to fetch links' })
+	}
+})
+
+// Get public links by userId (public endpoint - only returns public links - kept for backwards compatibility)
+router.get("/user/:userId", async (req, res) => {
+	try {
+		const linksService = getLinksService()
+		const links = await linksService.getByOwnerId(req.params.userId)
+
+		// Filter to only return public links for public endpoint
+		const publicLinks = links.filter(link => link.visibility === 'public')
+
+		res.send({ data: publicLinks })
 	} catch (error) {
 		console.error('Error fetching links:', error)
 		res.status(500).send({ error: 'Failed to fetch links' })

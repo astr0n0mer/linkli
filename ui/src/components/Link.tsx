@@ -27,9 +27,10 @@ interface LinkProps {
 	link: LinkType
 	isFirst: boolean
 	isLast: boolean
+	isOwnProfile: boolean
 }
 
-export const Link = ({ link, isFirst, isLast }: LinkProps) => {
+export const Link = ({ link, isFirst, isLast, isOwnProfile }: LinkProps) => {
 	const { title, url, slug, visibility } = link
 	const { moveLink, deleteLink, toggleLinkStatus } = useLinks()
 	const [showDeleteDialog, setShowDeleteDialog] = useState(false)
@@ -68,14 +69,15 @@ export const Link = ({ link, isFirst, isLast }: LinkProps) => {
 					{title}
 				</span>
 			</a>
-			<div className="absolute top-0 right-0 h-full">
-				<DropdownMenu>
-					<DropdownMenuTrigger asChild>
-						<Button variant="ghost" size="sm" className="h-full w-12 rounded-l-none hover:bg-accent">
-							<MoreVertical className="h-5 w-5" />
-						</Button>
-					</DropdownMenuTrigger>
-					<DropdownMenuContent align="end">
+			{isOwnProfile && (
+				<div className="absolute top-0 right-0 h-full">
+					<DropdownMenu>
+						<DropdownMenuTrigger asChild>
+							<Button variant="ghost" size="sm" className="h-full w-12 rounded-l-none hover:bg-accent">
+								<MoreVertical className="h-5 w-5" />
+							</Button>
+						</DropdownMenuTrigger>
+						<DropdownMenuContent align="end">
 						<DropdownMenuItem onClick={handleCopyLink}>
 							{copied ? (
 								<Check className="h-4 w-4 mr-2 text-green-600" />
@@ -132,18 +134,19 @@ export const Link = ({ link, isFirst, isLast }: LinkProps) => {
 						</DropdownMenuItem>
 					</DropdownMenuContent>
 				</DropdownMenu>
-			</div>
+				</div>
+			)}
 
 			{/* Edit Form Dialog */}
-			<LinkForm
+			{isOwnProfile && <LinkForm
 				mode="edit"
 				link={link}
 				open={showEditForm}
 				onOpenChange={setShowEditForm}
-			/>
+			/>}
 
 			{/* Delete Confirmation Dialog */}
-			<AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
+			{isOwnProfile && <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
 				<AlertDialogContent>
 					<AlertDialogHeader>
 						<AlertDialogTitle>Delete Link</AlertDialogTitle>
@@ -164,7 +167,7 @@ export const Link = ({ link, isFirst, isLast }: LinkProps) => {
 						</AlertDialogAction>
 					</AlertDialogFooter>
 				</AlertDialogContent>
-			</AlertDialog>
+			</AlertDialog>}
 		</div>
 	)
 }

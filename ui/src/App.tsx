@@ -1,12 +1,43 @@
 import './App.css'
+import { Routes, Route, Navigate } from 'react-router-dom'
 import { SignedIn, SignedOut, SignInButton, UserButton, useAuth } from '@clerk/clerk-react'
-import Profile from '@/components/Profile'
-import Links from '@/components/Links'
-import LinkForm from '@/components/LinkForm'
-import { LinksProvider } from '@/contexts/LinksContext'
-import { ProfileProvider } from '@/contexts/ProfileContext'
 import { ThemeToggle } from '@/components/ThemeToggle'
 import { Button } from '@/components/ui/button'
+import PublicProfileView from '@/components/PublicProfileView'
+import { ProfileProvider, useProfile } from '@/contexts/ProfileContext'
+
+function HomeRedirect() {
+	const { profile, loading } = useProfile()
+
+	if (loading) {
+		return (
+			<div className="flex min-h-screen items-center justify-center">
+				<div className="text-center space-y-4">
+					<div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900 dark:border-gray-100 mx-auto"></div>
+					<p className="text-muted-foreground">Loading...</p>
+				</div>
+			</div>
+		)
+	}
+
+	// If user has a username, redirect to their profile page
+	if (profile?.username) {
+		return <Navigate to={`/u/${profile.username}`} replace />
+	}
+
+	// Otherwise show username setup prompt
+	return (
+		<div className="flex min-h-screen items-center justify-center p-4">
+			<div className="text-center space-y-4">
+				<h2 className="text-2xl font-bold">Welcome! Set up your profile</h2>
+				<p className="text-muted-foreground">
+					Choose a username to create your personalized link page
+				</p>
+				{/* TODO: Add username setup form */}
+			</div>
+		</div>
+	)
+}
 
 function App() {
 	const { isLoaded } = useAuth()
@@ -35,35 +66,37 @@ function App() {
 				</SignedIn>
 			</div>
 
-			<SignedOut>
-				<div className="flex min-h-screen items-center justify-center">
-					<div className="text-center space-y-4 max-w-md px-4">
-						<h1 className="text-4xl font-bold">Create Your Linktree</h1>
-						<p className="text-muted-foreground text-lg">
-							One link to share everything. Connect your audience to all your content with a single link.
-						</p>
-						<SignInButton mode="modal">
-							<Button size="lg">Get Started</Button>
-						</SignInButton>
-					</div>
-				</div>
-			</SignedOut>
+			<Routes>
+				{/* Home route - show landing for logged out, redirect logged in users */}
+				<Route
+					path="/"
+					element={
+						<>
+							<SignedOut>
+								<div className="flex min-h-screen items-center justify-center">
+									<div className="text-center space-y-4 max-w-md px-4">
+										<h1 className="text-4xl font-bold">Create Your Linktree</h1>
+										<p className="text-muted-foreground text-lg">
+											One link to share everything. Connect your audience to all your content with a single link.
+										</p>
+										<SignInButton mode="modal">
+											<Button size="lg">Get Started</Button>
+										</SignInButton>
+									</div>
+								</div>
+							</SignedOut>
+							<SignedIn>
+								<ProfileProvider>
+									<HomeRedirect />
+								</ProfileProvider>
+							</SignedIn>
+						</>
+					}
+				/>
 
-			<SignedIn>
-				<ProfileProvider>
-					<Profile />
-				</ProfileProvider>
-
-				<LinksProvider>
-					<Links />
-					<div className="flex justify-center py-4">
-						<LinkForm
-							mode="add"
-							trigger={<Button>Add Link</Button>}
-						/>
-					</div>
-				</LinksProvider>
-			</SignedIn>
+				{/* Public profile view by username */}
+				<Route path="/u/:username" element={<PublicProfileView />} />
+			</Routes>
 		</>
 	)
 }

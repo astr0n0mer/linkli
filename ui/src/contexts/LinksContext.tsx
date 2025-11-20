@@ -8,6 +8,7 @@ interface LinksContextType {
 	links: LinkType[]
 	loading: boolean
 	error: string | null
+	isOwnProfile: boolean
 	dispatch: React.Dispatch<LinksAction>
 	addLink: (data: { title: string; url: string; slug: string; category: string }) => Promise<void>
 	editLink: (id: string, data: { title: string; url: string; slug: string; category: string }) => Promise<void>
@@ -19,23 +20,37 @@ interface LinksContextType {
 
 const LinksContext = createContext<LinksContextType | undefined>(undefined)
 
-export const LinksProvider = ({ children }: { children: ReactNode }) => {
+export const LinksProvider = ({ children, targetUsername, isOwnProfile }: { children: ReactNode; targetUsername?: string; isOwnProfile?: boolean }) => {
 	const { getToken, isSignedIn } = useAuth()
 	const [links, dispatch] = useReducer(linksReducer, [])
 	const [loading, setLoading] = useState(true)
 	const [error, setError] = useState<string | null>(null)
 
 	const refetch = async () => {
-		if (!isSignedIn) return
+		// If no target username and not signed in, nothing to fetch
+		if (!targetUsername && !isSignedIn) {
+			dispatch({ type: 'SET_LINKS', payload: [] })
+			setLoading(false)
+			return
+		}
 
 		try {
 			setLoading(true)
 			setError(null)
-			const token = await getToken()
-			if (!token) throw new Error('No auth token')
 
-			const response = await api.links.getAll(token)
-			dispatch({ type: 'SET_LINKS', payload: response.data })
+			// If viewing own profile (either no target username, or target username matches own)
+			// fetch all links (including private)
+			if ((!targetUsername && isSignedIn) || (isOwnProfile && isSignedIn)) {
+				const token = await getToken()
+				if (!token) throw new Error('No auth token')
+
+				const response = await api.links.getAll(token)
+				dispatch({ type: 'SET_LINKS', payload: response.data })
+			} else if (targetUsername) {
+				// Viewing someone else's links by username - only public links
+				const response = await api.links.getByUsername(targetUsername)
+				dispatch({ type: 'SET_LINKS', payload: response.data })
+			}
 		} catch (err) {
 			setError(err instanceof Error ? err.message : 'Failed to fetch links')
 			console.error('Error fetching links:', err)
@@ -46,7 +61,7 @@ export const LinksProvider = ({ children }: { children: ReactNode }) => {
 
 	useEffect(() => {
 		refetch()
-	}, [isSignedIn])
+	}, [targetUsername, isSignedIn, isOwnProfile])
 
 	const addLink = async (data: { title: string; url: string; slug: string; category: string }) => {
 		try {
@@ -116,7 +131,7 @@ export const LinksProvider = ({ children }: { children: ReactNode }) => {
 	}
 
 	return (
-		<LinksContext.Provider value={{ links, loading, error, dispatch, addLink, editLink, deleteLink, moveLink, toggleLinkStatus, refetch }}>
+		<LinksContext.Provider value={{ links, loading, error, isOwnProfile: isOwnProfile || false, dispatch, addLink, editLink, deleteLink, moveLink, toggleLinkStatus, refetch }}>
 			{children}
 		</LinksContext.Provider>
 	)

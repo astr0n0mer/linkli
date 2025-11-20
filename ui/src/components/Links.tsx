@@ -3,7 +3,7 @@ import { useLinks } from '@/contexts/LinksContext'
 import { LinkVisibility } from '@/lib/types'
 
 export const Links = () => {
-	const { links, loading, error } = useLinks()
+	const { links, loading, error, isOwnProfile } = useLinks()
 
 	if (loading) {
 		return (
@@ -46,6 +46,7 @@ export const Links = () => {
 					link={link}
 					isFirst={index === 0}
 					isLast={index === publicLinks.length - 1 && privateLinks.length === 0}
+					isOwnProfile={isOwnProfile}
 				/>
 			))}
 
@@ -63,6 +64,7 @@ export const Links = () => {
 							link={link}
 							isFirst={false}
 							isLast={index === privateLinks.length - 1}
+							isOwnProfile={isOwnProfile}
 						/>
 					))}
 				</>
