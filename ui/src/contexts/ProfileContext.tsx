@@ -2,10 +2,12 @@ import { createContext, useContext, useState, useEffect, type ReactNode } from '
 import { useAuth, useUser } from '@clerk/clerk-react'
 import { api } from '@/lib/api'
 
+// Profile data combining Clerk user info with custom bio from database
 export interface ProfileData {
-	fullName: string
-	bio: string
-	imageUrl: string
+	firstName: string // From Clerk
+	lastName: string // From Clerk
+	imageUrl: string // From Clerk
+	bio: string // From database
 }
 
 interface ProfileContextType {
@@ -39,31 +41,31 @@ export const ProfileProvider = ({ children }: { children: ReactNode }) => {
 			if (!token) throw new Error('No auth token')
 
 			const response = await api.profile.getMe(token)
+
+			// Combine Clerk data with database bio
 			setProfile({
-				fullName: response.data.username || user.fullName || '',
-				bio: response.data.bio || '',
-				imageUrl: response.data.avatarUrl || user.imageUrl || ''
+				firstName: user.firstName || '',
+				lastName: user.lastName || '',
+				imageUrl: user.imageUrl || '',
+				bio: response.data.bio || ''
 			})
 		} catch (err) {
-			// If profile doesn't exist yet, create it from Clerk user data
+			// If profile doesn't exist yet, create it with empty bio
 			const is404 = (err as any)?.status === 404
 
 			if (is404 && user) {
 				const defaultProfile = {
-					fullName: user.fullName || user.firstName || '',
-					bio: '',
-					imageUrl: user.imageUrl || ''
+					firstName: user.firstName || '',
+					lastName: user.lastName || '',
+					imageUrl: user.imageUrl || '',
+					bio: ''
 				}
 
-				// Create profile in database
+				// Create profile in database (only stores bio)
 				try {
 					const token = await getToken()
 					if (token) {
-						await api.profile.updateMe({
-							username: defaultProfile.fullName,
-							bio: defaultProfile.bio,
-							avatarUrl: defaultProfile.imageUrl
-						}, token)
+						await api.profile.updateMe({ bio: '' }, token)
 					}
 				} catch (createErr) {
 					console.error('Error creating profile:', createErr)
@@ -88,17 +90,20 @@ export const ProfileProvider = ({ children }: { children: ReactNode }) => {
 			const token = await getToken()
 			if (!token) throw new Error('No auth token')
 
+			// Only update bio in database (firstName, lastName, and imageUrl come from Clerk)
 			const response = await api.profile.updateMe({
-				username: data.fullName,
-				bio: data.bio,
-				avatarUrl: data.imageUrl
+				bio: data.bio
 			}, token)
 
-			setProfile({
-				fullName: response.data.username || '',
-				bio: response.data.bio || '',
-				imageUrl: response.data.avatarUrl || ''
-			})
+			// Combine updated bio with current Clerk data
+			if (user) {
+				setProfile({
+					firstName: user.firstName || '',
+					lastName: user.lastName || '',
+					imageUrl: user.imageUrl || '',
+					bio: response.data.bio || ''
+				})
+			}
 		} catch (err) {
 			setError(err instanceof Error ? err.message : 'Failed to update profile')
 			throw err

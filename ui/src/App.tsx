@@ -5,7 +5,6 @@ import Links from '@/components/Links'
 import LinkForm from '@/components/LinkForm'
 import { LinksProvider } from '@/contexts/LinksContext'
 import { ProfileProvider } from '@/contexts/ProfileContext'
-import { ThemeProvider } from '@/contexts/ThemeContext'
 import { ThemeToggle } from '@/components/ThemeToggle'
 import { Button } from '@/components/ui/button'
 
@@ -15,19 +14,17 @@ function App() {
 	// Show loading state while Clerk is checking authentication
 	if (!isLoaded) {
 		return (
-			<ThemeProvider>
-				<div className="flex min-h-screen items-center justify-center">
-					<div className="text-center space-y-4">
-						<div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900 dark:border-gray-100 mx-auto"></div>
-						<p className="text-muted-foreground">Loading...</p>
-					</div>
+			<div className="flex min-h-screen items-center justify-center">
+				<div className="text-center space-y-4">
+					<div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900 dark:border-gray-100 mx-auto"></div>
+					<p className="text-muted-foreground">Loading...</p>
 				</div>
-			</ThemeProvider>
+			</div>
 		)
 	}
 
 	return (
-		<ThemeProvider>
+		<>
 			<div className="fixed top-4 left-4 z-50">
 				<ThemeToggle />
 			</div>
@@ -65,7 +62,7 @@ function App() {
 					</div>
 				</LinksProvider>
 			</SignedIn>
-		</ThemeProvider>
+		</>
 	)
 }
 

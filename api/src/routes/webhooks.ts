@@ -14,13 +14,9 @@ router.post("/clerk", express.json(), async (req, res) => {
 		if (type === 'user.created') {
 			const profilesService = new ProfilesService()
 
-			// Create profile from Clerk user data
+			// Create profile with empty bio (username and avatar come from Clerk)
 			const profile = {
 				userid: data.id,
-				username: data.first_name
-					? `${data.first_name}${data.last_name ? ' ' + data.last_name : ''}`
-					: data.email_addresses?.[0]?.email_address || 'User',
-				avatarUrl: data.image_url || '',
 				bio: ''
 			}
 

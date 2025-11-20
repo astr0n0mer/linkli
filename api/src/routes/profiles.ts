@@ -29,11 +29,9 @@ router.put("/me", requireAuth(), async (req, res) => {
 	try {
 		const { userId } = getAuth(req)
 		const profilesService = getProfilesService()
-		const { username, avatarUrl, bio } = req.body
+		const { bio } = req.body
 
 		const updatedProfile = await profilesService.upsert(userId, {
-			username,
-			avatarUrl,
 			bio
 		})
 

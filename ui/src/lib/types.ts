@@ -17,8 +17,6 @@ export interface LinkType {
 }
 
 export interface Profile {
-	userid: string
-	username: string
-	avatarUrl: string
-	bio: string
+	userid: string // Clerk user ID - links to Clerk user
+	bio: string // Custom bio field (not stored in Clerk)
 }
