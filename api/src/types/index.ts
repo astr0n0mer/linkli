@@ -3,11 +3,12 @@ export enum LinkStatus {
 	INACTIVE = "inactive",
 }
 
-export interface Link {
-	id: string
+export interface LinkType {
+	id: string // unique identifier in the system
 	title: string
 	url: string
-	ownerId: string
+	slug: string // suffix to the app's hosted URL; basically the short URL
+	ownerId: string // who created it
 	createdAt: number
 	updatedAt: number
 	status: LinkStatus
@@ -17,6 +18,7 @@ export interface Link {
 
 export interface Profile {
 	userid: string
+	username: string
 	avatarUrl: string
 	bio: string
 }
