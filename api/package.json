@@ -25,6 +25,6 @@
 		"tsx": "^4.20.6"
 	},
 	"engines": {
-		"node": "lts"
+		"node": "22.x"
 	}
 }
