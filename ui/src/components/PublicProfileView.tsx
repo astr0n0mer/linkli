@@ -38,7 +38,7 @@ function ProfileContent({ username }: { username: string }) {
 								variant="default"
 								onClick={() => window.location.href = `/u/${user?.username}`}
 							>
-								Go to Your Linktree
+								Go to Your Linkli
 							</Button>
 						</div>
 					</div>
@@ -48,7 +48,7 @@ function ProfileContent({ username }: { username: string }) {
 							<p className="text-muted-foreground">Want your own page like this?</p>
 							<SignInButton mode="modal">
 								<Button size="lg" variant="default">
-									Create Your Linktree
+									Create Your Linkli
 								</Button>
 							</SignInButton>
 						</div>

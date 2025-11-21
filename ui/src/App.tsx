@@ -75,7 +75,7 @@ function App() {
 							<SignedOut>
 								<div className="flex min-h-screen items-center justify-center">
 									<div className="text-center space-y-4 max-w-md px-4">
-										<h1 className="text-4xl font-bold">Create Your Linktree</h1>
+										<h1 className="text-4xl font-bold">Create Your Linkli</h1>
 										<p className="text-muted-foreground text-lg">
 											One link to share everything. Connect your audience to all your content with a single link.
 										</p>

@@ -2,6 +2,14 @@ import type { LinkType, Profile } from './types'
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001'
 
+// Extended profile with Clerk data (returned by public profile endpoints)
+interface PublicProfile extends Profile {
+	username: string
+	firstName: string
+	lastName: string
+	avatarUrl: string
+}
+
 interface ApiOptions extends RequestInit {
 	token?: string
 }
@@ -90,10 +98,10 @@ export const api = {
 			apiRequest<ApiResponse<Profile>>('/api/v1/profiles/me', { token }),
 
 		getByUsername: (username: string) =>
-			apiRequest<ApiResponse<Profile & { firstName: string; lastName: string; avatarUrl: string }>>(`/api/v1/profiles/username/${username}`),
+			apiRequest<ApiResponse<PublicProfile>>(`/api/v1/profiles/username/${username}`),
 
 		getByUserId: (userId: string) =>
-			apiRequest<ApiResponse<Profile & { firstName: string; lastName: string; avatarUrl: string }>>(`/api/v1/profiles/${userId}`),
+			apiRequest<ApiResponse<PublicProfile>>(`/api/v1/profiles/${userId}`),
 
 		updateMe: (data: Partial<Omit<Profile, 'userid'>>, token: string) =>
 			apiRequest<ApiResponse<Profile>>('/api/v1/profiles/me', {

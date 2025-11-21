@@ -1,7 +1,7 @@
 import { MongoClient, Db } from 'mongodb'
 
 const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017'
-const DB_NAME = process.env.DB_NAME || 'linktree'
+const DB_NAME = process.env.DB_NAME || 'linkli'
 
 let client: MongoClient | null = null
 let db: Db | null = null
