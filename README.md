@@ -1,36 +1,105 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Linkli
+
+A modern, open-source link-in-bio application that allows users to create a personalized page with all their important links in one place.
+
+## Overview
+
+Linkli provides a simple way to share multiple links through a single URL. Users can create a profile, add links, organize them, and share their personalized page with others.
+
+## Tech Stack
+
+- **Framework**: Next.js 16 (App Router)
+- **Language**: TypeScript
+- **Database**: MongoDB (native driver)
+- **Authentication**: Clerk
+- **Styling**: Tailwind CSS v4
+- **UI Components**: shadcn/ui, Radix UI primitives
+- **Icons**: Lucide React
+
+## Features
+
+### Completed
+- [x] User authentication (Clerk integration)
+- [x] Profile management (bio editing)
+- [x] Public profile pages (`/u/:username`)
+- [x] Link CRUD operations (create, read, update, delete)
+- [x] Link ordering and reordering with persistence
+- [x] Public/private link visibility
+- [x] Dark/light theme support with system preference detection
+- [x] Auto-detected link icons based on domain (GitHub, Twitter, YouTube, etc.)
+- [x] Responsive design
+- [x] Context-based state management
+
+### In Progress / Planned
+- [ ] Webhook signature verification (Svix) for production
+- [ ] Short URL redirect feature (`/:slug` → actual URL)
+- [ ] Input validation (URL format, unique slugs)
+- [ ] Database indexes for performance
+- [ ] Click tracking and basic analytics
+- [ ] SEO meta tags (Open Graph, Twitter Cards)
+- [ ] Error toast notifications
+
+### Future Features
+- [ ] Link scheduling (start/end dates)
+- [ ] QR code generation
+- [ ] Drag and drop reordering
+- [ ] Custom themes per profile
+- [ ] Custom domain support
+- [ ] Advanced analytics (geographic data, referrers)
+- [ ] Multiple link types (embeds, contact forms)
+- [ ] Team/organization support
 
 ## Getting Started
 
-First, run the development server:
+### Prerequisites
+- Node.js 18+
+- MongoDB instance
+- Clerk account (for authentication)
+
+### Environment Variables
+
+Copy `.env.example` to `.env` and fill in the required values:
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+cp .env.example .env
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Required variables:
+- `MONGODB_URI` - MongoDB connection string
+- `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY` - Clerk publishable key
+- `CLERK_SECRET_KEY` - Clerk secret key
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### Installation
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```bash
+# Install dependencies
+pnpm install
 
-## Learn More
+# Run development server
+pnpm dev
 
-To learn more about Next.js, take a look at the following resources:
+# Build for production
+pnpm build
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+# Start production server
+pnpm start
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+### Project Structure
 
-## Deploy on Vercel
+```
+app/
+├── api/              # API routes (Next.js Route Handlers)
+│   ├── lib/          # Database connection, services
+│   └── v1/           # API v1 endpoints
+├── components/       # React components
+├── contexts/         # React context providers
+├── lib/              # Utilities, types, API client
+├── reducers/         # State reducers
+├── u/[username]/     # Dynamic user profile pages
+└── page.tsx          # Home page
+```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## License
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+MIT
