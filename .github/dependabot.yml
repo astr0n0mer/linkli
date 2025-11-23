@@ -1,0 +1,26 @@
+# Reference: https://docs.github.com/code-security/dependabot/working-with-dependabot/keeping-your-actions-up-to-date-with-dependabot#enabling-dependabot-version-updates-for-actions
+version: 2
+updates:
+  # - package-ecosystem: "github-actions"
+  #   directory: "/"
+  #   schedule:
+  #     interval: "monthly"
+
+    # Reference: https://docs.github.com/en/code-security/dependabot/dependabot-version-updates/configuring-dependabot-version-updates#enabling-dependabot-version-updates
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: "monthly"
+    groups:
+      minor-and-patch:
+        patterns:
+          - "*"  # Groups all minor/patch updates
+        update-types:
+          - "minor"
+          - "patch"
+
+      major-updates:
+        patterns:
+          - "*"  # Groups all major updates separately
+        update-types:
+          - "major"
