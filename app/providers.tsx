@@ -10,7 +10,7 @@ function ClerkWithTheme({ children }: { children: React.ReactNode }) {
   return (
     <ClerkProvider
       appearance={{
-        baseTheme: actualTheme === 'dark' ? dark : undefined,
+        theme: actualTheme === 'dark' ? dark : undefined,
       }}
     >
       {children}
