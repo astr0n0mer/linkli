@@ -1,43 +1,37 @@
-// TODO: branch icons are deprecated in lucide-react, use https://simpleicons.org/ instead
+import type { ComponentType } from 'react'
+import { Globe, Mail, Phone } from 'lucide-react'
 import {
-	Globe,
-	Github,
-	Twitter,
-	Linkedin,
-	Youtube,
-	Facebook,
-	Instagram,
-	Mail,
-	Phone,
-	Twitch,
-	Slack,
-	Gitlab,
-	Figma,
-	Dribbble,
-	Codepen,
-	type LucideIcon,
-	type LucideProps
-} from 'lucide-react'
+	SiGithub,
+	SiX,
+	SiYoutube,
+	SiFacebook,
+	SiInstagram,
+	SiTwitch,
+	SiGitlab,
+	SiFigma,
+	SiDribbble,
+} from '@icons-pack/react-simple-icons'
 
-const iconMap: Record<string, LucideIcon> = {
-	'github.com': Github,
-	'twitter.com': Twitter,
-	'x.com': Twitter,
-	'linkedin.com': Linkedin,
-	'youtube.com': Youtube,
-	'facebook.com': Facebook,
-	'instagram.com': Instagram,
-	'twitch.tv': Twitch,
-	'slack.com': Slack,
-	'gitlab.com': Gitlab,
-	'figma.com': Figma,
-	'dribbble.com': Dribbble,
-	'codepen.io': Codepen,
+// Lucide dropped brand icons, so brands come from https://simpleicons.org/
+// LinkedIn, Slack and CodePen aren't available there and fall back to Globe
+type IconComponent = ComponentType<{ className?: string }>
+
+const iconMap: Record<string, IconComponent> = {
+	'github.com': SiGithub,
+	'twitter.com': SiX,
+	'x.com': SiX,
+	'youtube.com': SiYoutube,
+	'facebook.com': SiFacebook,
+	'instagram.com': SiInstagram,
+	'twitch.tv': SiTwitch,
+	'gitlab.com': SiGitlab,
+	'figma.com': SiFigma,
+	'dribbble.com': SiDribbble,
 	'mailto:': Mail,
 	'tel:': Phone,
 }
 
-function getLinkIcon(url: string): LucideIcon {
+function getLinkIcon(url: string): IconComponent {
 	try {
 		// Handle mailto: and tel: protocols
 		if (url.startsWith('mailto:')) return Mail
@@ -55,8 +49,9 @@ function getLinkIcon(url: string): LucideIcon {
 	}
 }
 
-interface LinkIconProps extends LucideProps {
+interface LinkIconProps {
 	url: string
+	className?: string
 }
 
 /* eslint-disable react-hooks/static-components -- Dynamic icon selection based on URL is intentional */
